@@ -1,0 +1,44 @@
+# Nome da sua DLL
+DLL_NAME = libnightmare.dll
+
+# Compilador C++
+CXX = g++
+
+# Opções de compilação para criar uma DLL
+CXXFLAGS = -std=c++11 -Wall -shared -fPIC
+
+# Diretórios de origem e destino
+SRC_DIR = src
+BUILD_DIR = build
+
+# Lista de arquivos fonte
+SRCS = $(wildcard $(SRC_DIR)/Nightmare/*.cpp) \
+       $(wildcard $(SRC_DIR)/*.cpp)
+
+# Gere nomes de objetos com base em nomes de fonte
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+
+# Comando para criar diretórios, se não existirem
+MKDIR_P = mkdir -p
+
+# Alvo padrão: compilação da DLL
+all: $(BUILD_DIR) $(DLL_NAME)
+
+# Compilação da DLL
+$(DLL_NAME): $(OBJS)
+	$(CXX) $^ -o $@ $(CXXFLAGS)
+
+# Compilação dos arquivos fonte em objetos
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(MKDIR_P) $(dir $@) # Crie diretório se não existir
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Criação do diretório de construção, se não existir
+$(BUILD_DIR):
+	$(MKDIR_P) $(BUILD_DIR)
+
+# Limpa os arquivos de construção e a DLL
+clean:
+	rm -rf $(BUILD_DIR) $(DLL_NAME)
+
+.PHONY: all clean
